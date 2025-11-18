@@ -125,43 +125,81 @@ class DetailViewController: UIViewController, UINavigationControllerDelegate, UI
         themeToggleButton.layer.cornerRadius = 8
         themeToggleButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
         
-        // Add to view with constraints
-        [nameField, serialNumberField, valueField, dateLabel, imageView, themeToggleButton].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview($0)
+        // Bronze Challenge: Create labels and stack views for adaptive layout
+        let nameLabel = UILabel()
+        nameLabel.text = "Name"
+        
+        let serialLabel = UILabel()
+        serialLabel.text = "Serial"
+        
+        let valueLabel = UILabel()
+        valueLabel.text = "Value"
+        
+        // Create stack views for each field-label pair
+        let nameStack = UIStackView(arrangedSubviews: [nameLabel, nameField])
+        nameStack.spacing = 8
+        
+        let serialStack = UIStackView(arrangedSubviews: [serialLabel, serialNumberField])
+        serialStack.spacing = 8
+        
+        let valueStack = UIStackView(arrangedSubviews: [valueLabel, valueField])
+        valueStack.spacing = 8
+        
+        // Bronze Challenge: Set axis based on height size class
+        // In compact height (landscape), stack horizontally; otherwise vertically
+        if traitCollection.verticalSizeClass == .compact {
+            nameStack.axis = .horizontal
+            serialStack.axis = .horizontal
+            valueStack.axis = .horizontal
+        } else {
+            nameStack.axis = .vertical
+            serialStack.axis = .vertical
+            valueStack.axis = .vertical
         }
         
+        // Main vertical stack for all elements
+        let mainStack = UIStackView(arrangedSubviews: [nameStack, serialStack, valueStack, dateLabel, imageView, themeToggleButton])
+        mainStack.axis = .vertical
+        mainStack.spacing = 16
+        mainStack.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(mainStack)
+        
         NSLayoutConstraint.activate([
-            nameField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            nameField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            nameField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            mainStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            mainStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            mainStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            
             nameField.heightAnchor.constraint(equalToConstant: 40),
-            
-            serialNumberField.topAnchor.constraint(equalTo: nameField.bottomAnchor, constant: 16),
-            serialNumberField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            serialNumberField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             serialNumberField.heightAnchor.constraint(equalToConstant: 40),
-            
-            valueField.topAnchor.constraint(equalTo: serialNumberField.bottomAnchor, constant: 16),
-            valueField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            valueField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             valueField.heightAnchor.constraint(equalToConstant: 40),
             
-            dateLabel.topAnchor.constraint(equalTo: valueField.bottomAnchor, constant: 16),
-            dateLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            dateLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            
-            imageView.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 20),
-            imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             imageView.heightAnchor.constraint(equalToConstant: 200),
-            
-            // Chapter 16: Theme toggle button constraints
-            themeToggleButton.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20),
-            themeToggleButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            themeToggleButton.widthAnchor.constraint(equalToConstant: 250),
             themeToggleButton.heightAnchor.constraint(equalToConstant: 44)
         ])
+    }
+    
+    // Bronze Challenge: Update stack axis on trait collection changes
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        // Find all stack views and update their axis based on size class
+        for subview in view.subviews {
+            if let mainStack = subview as? UIStackView {
+                for arrangedSubview in mainStack.arrangedSubviews {
+                    if let fieldStack = arrangedSubview as? UIStackView {
+                        // Skip the main stack and only update field stacks
+                        if fieldStack.arrangedSubviews.count == 2 {
+                            if traitCollection.verticalSizeClass == .compact {
+                                fieldStack.axis = .horizontal
+                            } else {
+                                fieldStack.axis = .vertical
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     
     private func updateUI() {

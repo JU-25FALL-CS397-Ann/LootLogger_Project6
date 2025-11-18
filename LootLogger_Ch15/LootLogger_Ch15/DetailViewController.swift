@@ -188,14 +188,21 @@ class DetailViewController: UIViewController, UINavigationControllerDelegate, UI
     // MARK: - UIImagePickerControllerDelegate
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
-        // Get picked image from info dictionary
-        let image = info[.editedImage] as! UIImage
+        // Bronze Challenge: Prefer edited image, fallback to original
+        let edited = info[.editedImage] as? UIImage
+        let original = info[.originalImage] as? UIImage
+        let image = edited ?? original
+        
+        guard let finalImage = image else {
+            dismiss(animated: true, completion: nil)
+            return
+        }
         
         // Store the image in the ImageStore for the item's key
-        imageStore.setImage(image, forKey: item.itemKey)
+        imageStore.setImage(finalImage, forKey: item.itemKey)
         
         // Update the image view on screen
-        imageView.image = image
+        imageView.image = finalImage
         
         // Dismiss the image picker
         dismiss(animated: true, completion: nil)

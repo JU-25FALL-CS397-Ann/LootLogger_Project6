@@ -49,17 +49,12 @@ class ItemStore {
         allItems.insert(movedItem, at: toIndex)
     }
     
-    @discardableResult func saveChanges() -> Bool {
+    // Bronze Challenge: Throwing method instead of returning Bool
+    func saveChanges() throws {
         print("Saving items to: \(itemArchiveURL)")
-        do {
-            let encoder = PropertyListEncoder()
-            let data = try encoder.encode(allItems)
-            try data.write(to: itemArchiveURL)
-            print("Saved all of the Items")
-            return true
-        } catch let encodingError {
-            print("Error encoding allItems: \(encodingError)")
-            return false
-        }
+        let encoder = PropertyListEncoder()
+        let data = try encoder.encode(allItems)
+        try data.write(to: itemArchiveURL)
+        print("Saved all of the Items")
     }
 }

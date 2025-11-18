@@ -62,8 +62,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
         
-        // Silver Challenge: Save items when app enters background
-        itemStore.saveChanges()
+        // Bronze Challenge: Handle throwing saveChanges() with do-catch
+        do {
+            try itemStore.saveChanges()
+        } catch {
+            print("Error saving items: \(error)")
+        }
     }
 
 
